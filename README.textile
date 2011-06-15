@@ -40,7 +40,16 @@ da sessão você deve fazer:
 var Session = require('./<caminho_do_arquivo>/mongo_sessions').MongoSession;
 session = new Session();
 
-session.settings.db = config.sessions;
+// definição das configurações de acesso ao banco de dados. esses são os valores defaul
+// caso queira alterar um especifico, você pode usar "session.settings.db.<chave> : <valor>"
+session.settings.db = {
+	host: 'localhost',
+	port: '27017',
+	database: 'default',
+	collection: 'default',
+	username: 'seu_usuario',
+	password: 'sua_senha'
+};
 session.connect();
 
 var counter = 2;
