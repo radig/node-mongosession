@@ -78,3 +78,8 @@ explicita ou implicita.
 A licença que rege ele é  "MIT":http://www.opensource.org/licenses/mit-license.php
 Portanto você pode usa-lo, adapta-lo e redistribui-lo desde que mantendo a licença e
 os créditos originais.
+
+h2. @TODO
+
+* Adicionar suporte a troca de informações criptografadas entre quem cria a sessão e a classe
+* Decodificar a sessão salva pelo PHP
