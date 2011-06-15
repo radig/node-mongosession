@@ -1,0 +1,80 @@
+h1. Classe para verificar Sessão via Node.js
+
+h2. Apresentação
+
+O compartilhamento da sessão do usuário entre diferentes
+sistemas é uma necessidade cada vez mais comum.
+
+A partir de um problema envolvendo compartilhamento de sessão
+entre uma aplicação PHP e outra Node.js acabamos por implementar
+um meio de comunicação baseado em banco de dados (inicialmente
+o banco de dados é o MongoDB).
+
+A aplicação PHP é responsável pela autenticação e criação da
+sessão, que então fica armazenada no banco MongoDB. O Node.js
+compartilha as credenciais de acesso ao banco de dados
+e pode verificar as sessões existentes.
+
+Por utilizar um formato próprio e de difícil leitura, os dados
+guardados na sessão do PHP não poderam ser utilizados, ao menos
+num primeiro momento. Para contornar o problema, a função
+que salva os dados da sessão no banco adiciona um coluna
+com dados em formato legível pelo Node.js (texto puro, por exemplo),
+que então pode trabalhar com estas informações.
+
+Por motivos óbvios, informações sensíveis não devem ser armazenadas
+neste campo, a não ser que você saiba muito bem o que está fazendo.
+
+h2. Instruções de uso
+
+O módulo mongodb-native é requerido para funcionamento desta classe,
+instale-o com o comando
+
+bc. npm mongodb
+
+Com o módulo instalado você deve copiar a classe que deseja (*mono_session.js*)
+para alguma pasta do seu sistema. Dentro do programa que você quer checar um valor
+da sessão você deve fazer:
+
+<pre>
+var Session = require('./<caminho_do_arquivo>/mongo_sessions').MongoSession;
+session = new Session();
+
+session.settings.db = config.sessions;
+session.connect();
+
+var counter = 2;
+
+// cria um pequeno loop para dar tempo da alteração de sessão (login/logout) fixar no bd
+var interval = setInterval(function(){
+	var valor = session.check(<ID_DA_SESSAO>, <NOME_DO_CAMPO>);
+	
+	// caso seja válida
+	if(valor != null)
+	{
+		console.log("Sua sessão tem o valor:");
+		console.log(valor);
+	}
+	
+	if(counter-- <= 0)
+	{
+		// cancela loop
+		clearInterval(interval);
+	}
+	
+}, 200);
+</pre>
+
+h2. Copyright
+
+2011 - "Radig Soluções em TI":http://radig.com.br
+Todos os direitos reservados.
+
+h2. Licença
+
+Esse código é disponibilizado da forma que está, sem nehuma garantia
+explicita ou implicita.
+
+A licença que rege ele é  "MIT":http://www.opensource.org/licenses/mit-license.php
+Portanto você pode usa-lo, adapta-lo e redistribui-lo desde que mantendo a licença e
+os créditos originais.
