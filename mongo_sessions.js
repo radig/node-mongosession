@@ -61,7 +61,7 @@ var MongoSession = exports.MongoSession = function() {
 	this.connect = function() {
 		self = this;
 		
-		self.conn = new Db(this.settings.db.database, new Server(self.settings.db.host, self.settings.db.port, {}), {native_parser:true});
+		self.conn = new Db(self.settings.db.database, new Server(self.settings.db.host, self.settings.db.port, {}), {native_parser:true});
 		
 		self.conn.open(function(err, db) {
 			if(db === null)
@@ -97,10 +97,10 @@ var MongoSession = exports.MongoSession = function() {
 			}
 		}
 		
-		self.db.collection('sessions', function(err, collection) {
+		self.db.collection(this.settings.db.collection, function(err, collection) {
 			if(collection === null)
 			{
-				console.log("Session: Não acessar coleção.");
+				console.log("Session: Não é possível acessar a coleção.");
 				console.log(err);
 					
 				return false;
