@@ -59,7 +59,7 @@ var MongoSession = exports.MongoSession = function() {
 	 * da sessão.
 	 */
 	this.connect = function() {
-		self = this;
+		var self = this;
 		
 		self.conn = new Db(self.settings.db.database, new Server(self.settings.db.host, self.settings.db.port, {}), {native_parser:true});
 		
@@ -84,7 +84,7 @@ var MongoSession = exports.MongoSession = function() {
 	 * ser retornado (field).
 	 */
 	this.check = function(session, field) {
-		self = this;
+		var self = this;
 		
 		// caso conexão ainda não tenha sido estabelecida, tenta estabeler uma
 		if(self.db === null) {

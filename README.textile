@@ -32,7 +32,7 @@ instale-o com o comando
 
 bc. npm mongodb
 
-Com o módulo instalado você deve copiar a classe que deseja (*mono_session.js*)
+Com o módulo instalado você deve copiar a classe que deseja (*mongo_session.js*)
 para alguma pasta do seu sistema. Dentro do programa que você quer checar um valor
 da sessão você deve fazer:
 
