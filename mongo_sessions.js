@@ -13,15 +13,6 @@
  */
 
 /**
- * Carregamento das classes necessárias a comunicação com MongoDB
- * Utiliza o módulo mongodb-native para conexão (instalar via NPM).
- */ 
-var Db = require('mongodb').Db,
-	Connection = require('mongodb').Connection,
-	Server = require('mongodb').Server,
-	BSON = require('mongodb').BSONNative;
-
-/**
  * Classe para validação de sessão no banco de dados
  * 
  * Faz a conexão no banco de dados (no caso MongoDB),
@@ -29,7 +20,14 @@ var Db = require('mongodb').Db,
  * informado (normalmente a sessão corrente).
  * 
  */
-var MongoSession = exports.MongoSession = function() {
+var MongoSession = exports.MongoSession = function(config) {
+	/**
+	 * Carregamento das classes necessárias a comunicação com MongoDB
+	 * Utiliza o módulo mongodb-native para conexão (instalar via NPM).
+	 */ 
+	var Db = require('mongodb').Db,
+		Server = require('mongodb').Server;
+	
 	this.settings = {
 		db: {
 			host: 'localhost',
@@ -46,10 +44,31 @@ var MongoSession = exports.MongoSession = function() {
 	};
 	
 	this.db = null;
+
+	this.value = null;
 	
 	this.conn = null;
 	
-	this.value = null;
+	/**
+	 * Mescla recursivamente os atributos de dois objetos
+	 */
+	this.mergeProperties = function(destination, source) {
+		var self = this;
+		
+		for (var property in source) {
+			if (source.hasOwnProperty(property) && (source[property] != '' && source[property] !== null)) {
+				
+				if(typeof source[property] == 'object' && source[property] !== null) {
+					destination[property] = self.mergeProperties(destination[property], source[property]);
+				}
+				else {
+					destination[property] = source[property];
+				}
+			}
+		}
+		
+		return destination;
+	};
 	
 	/**
 	 * Efetua conexão com banco de dados que contém
@@ -60,8 +79,6 @@ var MongoSession = exports.MongoSession = function() {
 	 */
 	this.connect = function() {
 		var self = this;
-		
-		self.conn = new Db(self.settings.db.database, new Server(self.settings.db.host, self.settings.db.port, {}), {native_parser:true});
 		
 		self.conn.open(function(err, db) {
 			if(db === null)
@@ -86,15 +103,9 @@ var MongoSession = exports.MongoSession = function() {
 	this.check = function(session, field) {
 		var self = this;
 		
-		// caso conexão ainda não tenha sido estabelecida, tenta estabeler uma
 		if(self.db === null) {
-			self.connect();
-			
-			// caso não haja sucesso, retorna false e printa mensagem no console
-			if(self.db === null) {
-				console.log("Session: É preciso conectar ao Banco antes de utilizar seus dados.");
-				return false;
-			}
+			console.log("Session: É preciso conectar ao Banco antes de utilizar seus dados.");
+			return false;
 		}
 		
 		self.db.collection(this.settings.db.collection, function(err, collection) {
@@ -107,7 +118,7 @@ var MongoSession = exports.MongoSession = function() {
 			}
 			
 			collection.findOne({'_id': session}, function(err, doc) {
-				if(doc != 'undefined') {
+				if(typeof doc != 'undefined' && typeof doc[field] != 'undefined') {
 					self.value = doc[field];
 				}
 			});
@@ -115,4 +126,16 @@ var MongoSession = exports.MongoSession = function() {
 		
 		return self.value;
 	};
+	
+	/**
+	 * Inicialização dos atributos
+	 */
+	
+	if(typeof config != 'undefined' && config !== null) {
+		this.settings = this.mergeProperties(this.settings, config);
+	}
+	
+	this.conn = new Db(this.settings.db.database, new Server(this.settings.db.host, this.settings.db.port, {}), {native_parser:true});
+	
+	this.connect();
 };
