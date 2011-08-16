@@ -121,6 +121,7 @@ var MongoSession = exports.MongoSession = function(config) {
 				if(typeof doc != 'undefined' && typeof doc[field] != 'undefined') {
 					self.value = doc[field];
 				}
+				
 			});
 		});
 		
