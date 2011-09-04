@@ -80,27 +80,29 @@ var MongoSession = exports.MongoSession = function(config) {
 	this.connect = function() {
 		var self = this;
 		
-		self.conn.open(function(err, db) {
-			if(db === null)
-			{
-				console.log("Session: Não foi possível abrir o BD.");
-				console.log(err);
+		if(self.db === null) {
+			self.conn.open(function(err, db) {
+				if(db === null)
+				{
+					console.log("Session: Não foi possível abrir o BD.");
+					console.log(err);
+					
+					return false;
+				}
 				
-				return false;
-			}
-			
-			self.db = db;
-		});
+				self.db = db;
+			});
+		}
 	};
 	
 	/**
 	 * Método responsável por retornar um determinado valor da sessão
 	 * salva no banco.
 	 *  
-	 * Recebe como parâmetro o id da sessão (session) e o campo que deverá
-	 * ser retornado (field).
+	 * Recebe como parâmetro o id da sessão (session) e o campo (field) que deverá
+	 * será passado ao callback (callback).
 	 */
-	this.check = function(session, field) {
+	this.check = function(session, field, callback) {
 		var self = this;
 		
 		if(self.db === null) {
@@ -120,6 +122,11 @@ var MongoSession = exports.MongoSession = function(config) {
 			collection.findOne({'_id': session}, function(err, doc) {
 				if(typeof doc != 'undefined' && typeof doc[field] != 'undefined') {
 					self.value = doc[field];
+					
+					callback(err, doc[field]);
+				}
+				else {
+					callback(err, null);
 				}
 				
 			});
@@ -136,7 +143,7 @@ var MongoSession = exports.MongoSession = function(config) {
 		this.settings = this.mergeProperties(this.settings, config);
 	}
 	
-	this.conn = new Db(this.settings.db.database, new Server(this.settings.db.host, this.settings.db.port, {}), {native_parser:true});
+	this.conn = new Db(this.settings.db.database, new Server(this.settings.db.host, this.settings.db.port, {}));
 	
 	this.connect();
 };
