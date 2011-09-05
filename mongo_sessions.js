@@ -120,6 +120,7 @@ var MongoSession = exports.MongoSession = function(config) {
 			}
 			
 			collection.findOne({'_id': session}, function(err, doc) {
+				
 				if(typeof doc != 'undefined' && typeof doc[field] != 'undefined') {
 					self.value = doc[field];
 					
