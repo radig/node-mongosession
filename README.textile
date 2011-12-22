@@ -7,8 +7,7 @@ sistemas é uma necessidade cada vez mais comum.
 
 A partir de um problema envolvendo compartilhamento de sessão
 entre uma aplicação PHP e outra Node.js acabamos por implementar
-um meio de comunicação baseado em banco de dados (inicialmente
-o banco de dados é o MongoDB).
+um meio de comunicação baseado em banco de dados (MongoDB).
 
 A aplicação PHP é responsável pela autenticação e criação da
 sessão, que então fica armazenada no banco MongoDB. O Node.js
@@ -37,41 +36,23 @@ para alguma pasta do seu sistema. Dentro do programa que você quer checar um va
 da sessão você deve fazer:
 
 <pre>
-var Session = require('./<caminho_do_arquivo>/mongo_sessions').MongoSession;
-session = new Session();
-
-// definição das configurações de acesso ao banco de dados. esses são os valores defaul
-// caso queira alterar um especifico, você pode usar "session.settings.db.<chave> : <valor>"
-session.settings.db = {
+// definição das configurações de acesso ao banco de dados. esses são os valores default
+var Config = {
 	host: 'localhost',
 	port: '27017',
-	database: 'default',
-	collection: 'default',
-	username: 'seu_usuario',
-	password: 'sua_senha'
-};
-session.connect();
+	database: 'sessions',
+	collection: 'sessions'
+}
 
-var counter = 2;
+var Session = require('./<caminho_do_arquivo>/mongo_sessions').MongoSession;
+var s = new Session(Config);
 
-// cria um pequeno loop para dar tempo da alteração de sessão (login/logout) fixar no bd
-var interval = setInterval(function(){
-	var valor = session.check(<ID_DA_SESSAO>, <NOME_DO_CAMPO>);
-	
-	// caso seja válida
-	if(valor != null)
-	{
-		console.log("Sua sessão tem o valor:");
-		console.log(valor);
-	}
-	
-	if(counter-- <= 0)
-	{
-		// cancela loop
-		clearInterval(interval);
-	}
-	
-}, 200);
+s.check(this, <ID_DA_SESSAO>, <NOME_DO_CAMPO>, myCallback, {variaveis:'passadas_ao_callback'}));
+
+function myCallback(self, <VALOR_DO_CAMPO>, extra) {
+	console.log(<VALOR_DO_CAMPO>);
+	console.log(extra); // {variaveis:passadas_ao_callback}
+}
 </pre>
 
 h2. Copyright
