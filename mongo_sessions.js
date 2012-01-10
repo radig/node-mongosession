@@ -24,7 +24,7 @@ var Db = require('mongodb').Db,
  * informado (normalmente a sessão corrente).
  * 
  */
-var MongoSession = exports.MongoSession = function(config) {
+exports.MongoSession = function(config) {
 	
 	this.settings = {
 		host: 'localhost',
@@ -59,13 +59,13 @@ var MongoSession = exports.MongoSession = function(config) {
 		var self = this;
 
 		self.MongoDB.open(function(err, db) {
-			if(db === null) {
+			if(db == null && err != null) {
 				util.log("Session: Não foi possível abrir o BD.");
 				util.log(err);
 			}
 			else {
 				db.collection(self.settings.collection, function(err, collection) {
-					if(collection === null) {
+					if(collection == null && err != null) {
 						util.log("Session: Não é possível acessar a coleção.");
 						util.log(err);
 					}
@@ -101,7 +101,7 @@ var MongoSession = exports.MongoSession = function(config) {
 
 					callback(obj, doc[field], pass);
 				}
-				else {
+				else if(err != null) {
 					util.log(err);
 				}
 			});
