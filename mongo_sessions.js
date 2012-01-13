@@ -96,13 +96,18 @@ exports.MongoSession = function(config) {
 		if(self.data !== null) {
 			
 			self.data.findOne({'_id': session}, function(err, doc) {
-				if(doc != null && typeof doc != 'undefined' && typeof doc[field] != 'undefined') {
+				if(err) {
+					util.log("Session: Não foi possível recuperar a sessão de id " + session);
+					util.log(err);
+				}
+				else if(typeof doc !== 'undefined' && typeof doc[field] !== 'undefined') {
 					self.value = doc[field];
+					
+					if(typeof pass === 'undefined') {
+						pass = null;
+					}
 
 					callback(obj, doc[field], pass);
-				}
-				else if(err != null) {
-					util.log(err);
 				}
 			});
 		}
